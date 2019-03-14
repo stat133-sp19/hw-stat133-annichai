@@ -1,0 +1,63 @@
+---
+title: "Work Out 1"
+author: 'Anni Chai'
+output: github_document
+---
+The NBA’s influence on the game of basketball has been no short of significance. The NBA has become a synynom for basketball. It has shaped basketball into one of the most popular sports on this planet. With the rise of expososure of the NBA and the flow of money in this industrty, data analytics, one of the biggest game changers in the NBA history, has become the driving force behind many decisions, including strategies, trading, predictions, and many more.  
+
+We are going to take a look at five of the most legendary players who played in the 2016 season: Draymond Green, Andre Iguodala, Kevin Durant, Klay Thompson, Stephen Curry. We will visualize some key data related to their success, and hopefully find a pattern, or perhaps a formula, to their successes.
+```{r include=FALSE}
+library(readr)
+library(dplyr)
+
+#import shots_data.csv using relative file path
+dat = read.csv("../data/shots_data.csv", stringsAsFactors = F) 
+```
+
+First, We will take a look at the 2 point field goal effective shooting percentage by player. The column 'total' stands for how many 2 point attempts each player made during the season, and 'made' represents the actual shots that have scored. The column 'perc_made' stands for the percentage of 2 point shots that were effective.
+```{r echo = FALSE}
+#2PT Effective Shooting % by Player
+dat2pt = dat[dat$shot_type == '2PT Field Goal', ]
+made2pt = dat2pt[dat2pt$shot_made_flag == "shot_yes",]
+sum_made = summarise(group_by(made2pt, name), made = n())
+sum_total =summarise(group_by(dat2pt, name), total = n())
+
+table2pt = inner_join(sum_total, sum_made)
+table2pt$perc_made = table2pt$made/table2pt$total*100
+table2pt = arrange(table2pt, desc(perc_made))
+print(table2pt)
+```
+Next, We will a look at the 3 point field goal effective shooting percentage by player.Here, the column 'perc_made' stands for the percentage of 3 point shots that were effective. As you can see, Kevin Durant was significantly better at 3 points shots than all the other players.
+```{r echo = FALSE}
+#3PT Effective Shooting % by Player:
+dat3pt = dat[dat$shot_type == '3PT Field Goal', ]
+made3pt = dat2pt[dat3pt$shot_made_flag == "shot_yes",]
+sum_made3 = summarise(group_by(made3pt, name), made = n())
+sum_total3 =summarise(group_by(dat3pt, name), total = n())
+
+table3pt = inner_join(sum_total3, sum_made3)
+table3pt$perc_made = table3pt$made/table3pt$total*100
+table3pt = arrange(table3pt, desc(perc_made))
+print(table3pt)
+
+```
+
+Then we have the effective total shooting percent for these five players. Kevin Durant seems to have the highest accuracy out of all these players. Though Andre Iguodala came in second place, ahead of Klay Thompson and Stephen Curry, he made only a quarter as many attempts as the other two. During the season, Klay Thompson and Stephen Curry each made over 500 shots for their teams, ahead of everyone else.
+```{r echo = FALSE}
+#Effective Shooting % by Player: Overall (i.e. including 2PT and 3PT Field Goals)
+#effective shooting percentage by player, arranged in descending order by percentage
+madeall = dat[dat$shot_made_flag == "shot_yes",]
+sum_madeall =summarise(group_by(madeall, name), made = n())
+sum_totalall = summarise(group_by(dat, name), total = n())
+tabletotal = inner_join(sum_madeall, sum_totalall)
+tabletotal$perc_made = tabletotal$made/tabletotal$total*100
+tabletotal = arrange(tabletotal, desc(perc_made))
+print(tabletotal)
+```
+
+Now, let's look at the player's positions in comparison to their accuracy. Andre Iguodala seems to have roughly the same effectiveness with three pointers and two pointers. Draymond Green has the highest density of red in his chart. If you look at the chart above, he does, indeed, have the lowest shot effectiveness out of all five players. Kevin Durant, Klay Thompson, and Stephen Curry's charts has a very high sensity of blue as well as red, indicating that he made many attempts duing the season. Interestingly, Stephen Curry often attemped to score from behind the midlin, and a few of them were effective.
+```{r out.width='80%', echo=FALSE, fig.align='center'}
+knitr::include_graphics('gsw-shot-charts.png')
+
+```
+Overall, data-driven analysis seems to be an interesting change in the NBA industry. When all the data is available in public, the prediction game is completely dependent on one's ability to make use of it, to organize, analyze, find patterns.
